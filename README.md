@@ -1,4 +1,4 @@
-# Account service
+# Customer service
 
 This project uses Quarkus.
 
