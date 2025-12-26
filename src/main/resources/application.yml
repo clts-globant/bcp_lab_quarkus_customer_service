@@ -1,0 +1,88 @@
+# Database configuration
+quarkus:
+  datasource:
+    db-kind: postgresql
+    username: customer_user
+    password: customer_password
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/customer_db
+
+  # Hibernate ORM configuration
+  hibernate-orm:
+    database:
+      generation: update
+    log:
+      sql: true
+
+  # HTTP configuration
+  http:
+    port: 8081
+    cors:
+      ~: true
+      origins: "*"
+      headers: "*"
+      methods: "*"
+
+  # Health check configuration
+  smallrye-health:
+    ui:
+      always-include: true
+
+  # Logging configuration
+  log:
+    level: INFO
+    category:
+      "com.bank.customer":
+        level: DEBUG
+
+  # Metrics configuration
+  micrometer:
+    export:
+      prometheus:
+        enabled: true
+        path: /q/metrics
+
+  # Application configuration
+  application:
+    name: customer-service
+    version: 1.0.0-SNAPSHOT
+
+  # JWT configuration
+  smallrye-jwt:
+    enabled: true
+
+  # Security configuration
+  security:
+    jpa:
+      enabled: true
+      users-table: users
+      roles-table: roles
+    users:
+      embedded:
+        enabled: true
+        plain-text: true
+        users:
+          admin: admin,ROLE_ADMIN,ROLE_USER
+          user: user,ROLE_USER
+          viewer: viewer,ROLE_VIEWER
+
+# MicroProfile JWT configuration
+mp:
+  jwt:
+    verify:
+      publickey:
+        location: META-INF/resources/publicKey.pem
+      issuer: https://banking.local
+
+---
+# Dev profile
+"%dev":
+  quarkus:
+    datasource:
+      jdbc:
+        url: jdbc:postgresql://localhost:5432/customer_db
+    hibernate-orm:
+      database:
+        generation: drop-and-create
+      sql-load-script: import-data.sql
+

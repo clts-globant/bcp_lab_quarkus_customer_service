@@ -1,0 +1,12 @@
+# Test profile
+"%test":
+  quarkus:
+    datasource:
+      db-kind: h2
+      jdbc:
+        url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    hibernate-orm:
+      database:
+        generation: drop-and-create
+      sql-load-script: import-data.sql
+
