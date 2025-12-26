@@ -1,12 +1,58 @@
-# customer-service
+# Account service
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project uses Quarkus.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+This microservice creates and allows basic validation of customers for the case uses described by the transactions
+microservice: https://github.com/clts-globant/bcp_lab_quarkus_transaction_service
+
+Features:
+
+* Get customer basic details by id
+
+`
+curl -v -X GET http://localhost:8081/api/customers/{customer_id}
+-H "Authorization: Bearer $JWT_TOKEN"
+`
+
+Details include name, documentid, email and status (`ACTIVE` if valid for transactions.
+
+* Create a new customer
+
+`
+curl -v -X POST http://localhost:8081/api/customers
+-H "Content-Type: application/json"
+-H "Authorization: Bearer $JWT_ADMIN_TOKEN"
+-d '{
+"name": "Jane Doe",
+"email": "jane.doe@example.com",
+"documentId": "ID-987654321"
+}'
+`
+
+No particular validation details checked at the moment, like unique email or documentId, but the respective
+code is commented out if you wanna try it by yourself.
+
+* Customer validation to see if it's valid for transactions
+
+`
+curl -v -X GET http://localhost:8081/api/customers/{customer_id}/validate
+-H "Authorization: Bearer $JWT_TOKEN"
+`
+
+Look for `valid` in the response body, boolean value.
+
+Basic health checks (like `q/health`) and metrics are supported thanks to Quarkus/micrometer.
+Read https://quarkus.io/guides/management-interface-reference for more details.
+
+## Unit/integration tests
+Run
+```shell script
+./mvnw test
+```
 
 ## Running the application in dev mode
 
-You can run your application in dev mode that enables live coding using:
+You can run your application in dev mode + live coding:
 ```shell script
 ./mvnw compile quarkus:dev
 ```
@@ -19,62 +65,36 @@ The application can be packaged using:
 ```shell script
 ./mvnw package
 ```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Not an uber jar, as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+Run with `java -jar target/quarkus-app/quarkus-run.jar`.
 
-If you want to build an _über-jar_, execute the following command:
+For uber jar:
 ```shell script
 ./mvnw package -Dquarkus.package.type=uber-jar
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+Run with `java -jar target/*-runner.jar`.
 
 ## Creating a native executable
 
-You can create a native executable using: 
 ```shell script
 ./mvnw package -Dnative
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
+Application not tested with native build, so far.
+
+You can run the native executable build in a container with:
 ```shell script
 ./mvnw package -Dnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/customer-service-1.0.0-SNAPSHOT-runner`
+Then simply execute with: `./target/account-service-1.0.0-SNAPSHOT-runner`
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
+## Generating a valid JWT
 
-## Related Guides
+The JWT is only checked for completeness, not for full authorization+authentication, as a full identity system
+wasn't implemented for the whole solution. As long as the JWT is valid, it should be usable.
 
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- SmallRye Health ([guide](https://quarkus.io/guides/smallrye-health)): Monitor service health
-- SmallRye JWT ([guide](https://quarkus.io/guides/security-jwt)): Secure your applications with JSON Web Token
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Micrometer Registry Prometheus ([guide](https://quarkus.io/guides/micrometer)): Enable Prometheus support for Micrometer
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### SmallRye Health
-
-Monitor your application's health using SmallRye Health
-
-[Related guide section...](https://quarkus.io/guides/smallrye-health)
+Instructions to generate a key pair: https://techdocs.akamai.com/iot-token-access-control/docs/generate-rsa-keys
+Instructions to generate a JWT wit said keys: https://techdocs.akamai.com/iot-token-access-control/docs/generate-jwt-rsa-key
