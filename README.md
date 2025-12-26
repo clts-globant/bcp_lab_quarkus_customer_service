@@ -44,6 +44,11 @@ Look for `valid` in the response body, boolean value.
 Basic health checks (like `q/health`) and metrics are supported thanks to Quarkus/micrometer.
 Read https://quarkus.io/guides/management-interface-reference for more details.
 
+## Before running
+
+Don't forget to boot up a PostgreSQL instance of your preference before starting this service.
+Respective ports/URLs can be configured in `src/main/resources/application.yml`
+
 ## Unit/integration tests
 Run
 ```shell script
